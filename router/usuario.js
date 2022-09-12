@@ -31,8 +31,15 @@ router.post('/', async function(req, res){
 });
 
 //Leer
-router.get('/', function(req, res){ 
-    res.send('Crear Usuario Get');
+router.get('/', async function(req, res){  //No recibe parametros
+  try{
+    const usuarios = await Usuario.find();
+    res.send(usuarios)
+
+  }catch(error){
+    console.log(error);
+    res.send('Ocurrió un error');
+  }
 });
 
 //Actualizar
@@ -42,7 +49,7 @@ router.put('/:usuarioId', async function(req, res){
         console.log('Objeto recibido',req.body, req.params);
 
         let usuario = await Usuario.findById(req.params.usuarioId); //Actualizar usuario
-        if (!usuario){
+        if (!usuario){//Validar si existe
             return res.send('No existe el usuario');
         }
 
