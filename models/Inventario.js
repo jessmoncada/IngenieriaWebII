@@ -7,6 +7,7 @@ const InventarioSchema = Schema({
    serial:{
     type: String,
     require: true,
+    unique: true,
    },
    modelo:{
     type: String,
@@ -44,7 +45,7 @@ const InventarioSchema = Schema({
    },
    tipoEquipo:{
     type: Schema.Types.ObjectId,
-    ref:'TTipoEquipo',
+    ref:'TipoEquipo',
     require: true,
    },
    estadoEquipo:{
