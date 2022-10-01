@@ -1,12 +1,16 @@
 const  { getConnection } = require('./db/db_connection_mongo');
 const express = require('express');
+const cors = require ('cors')
+require('dotenv').config();
 
 const app = express ();
+const port = process.env.PORT;
 
-const port = 3000;
+app.use(cors());
+
 getConnection();
 
-//Para tratar cono Json (Parseo)
+//Para tratar como Json (Parseo)
 app.use(express.json());
 
 app.use('/usuario', require('./router/usuario')); 
