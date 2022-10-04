@@ -1,18 +1,18 @@
 const { Router } = require('express');
 const Inventario = require('../models/Inventario');
-const router = Router ();
+const router = Router();
 
 //Crear recursos 
-router.post('/', async function(req, res){
-  
-    try{
+router.post('/', async function (req, res) {
+
+    try {
         console.log(req.body);
 
-        const existeInventarioPorSerial = await Inventario.findOne({serial: req.body.serial}); 
-        if (existeInventarioPorSerial){
+        const existeInventarioPorSerial = await Inventario.findOne({ serial: req.body.serial });
+        if (existeInventarioPorSerial) {
             return res.send('Ya existe el serial para otro equipo');
         }
-        let inventario = new Inventario(); 
+        let inventario = new Inventario();
         inventario.serial = req.body.serial;
         inventario.modelo = req.body.modelo;
         inventario.descripcion = req.body.descripcion;
@@ -25,23 +25,23 @@ router.post('/', async function(req, res){
         inventario.tipoEquipo = req.body.tipoEquipo._id;
         inventario.estadoEquipo = req.body.estadoEquipo._id;
         inventario.fechaCreacion = new Date();
-        inventario.fechaActualizacion = new Date ();
-    
+        inventario.fechaActualizacion = new Date();
+
         inventario = await inventario.save();
-    
+
         res.send(inventario);
-    } catch(error){
+    } catch (error) {
         console.log(error);
         res.send('Ocurrió un error');
     }
 
 });
 
-router.get('/', async function(req, res){
-    
-    try{
+router.get('/', async function (req, res) {
+
+    try {
         const inventario = await Inventario.find().populate([
-        
+
             {
                 path: 'usuario', select: 'nombre email estado'
 
@@ -61,23 +61,23 @@ router.get('/', async function(req, res){
             },
         ]);
         res.send(inventario);
-    
-      }catch(error){
+
+    } catch (error) {
         console.log(error);
         res.send('Ocurrió un error');
-      }
+    }
 });
 
-router.put('/:inventarioId', async function(req, res){
+router.put('/:inventarioId', async function (req, res) {
 
-    try{
-        let inventario = await Inventario.findById(req.params.inventarioId); 
-        if(!inventario){
-          return res.send('Inventario no existe');
+    try {
+        let inventario = await Inventario.findById(req.params.inventarioId);
+        if (!inventario) {
+            return res.send('Inventario no existe');
         }
 
-        const existeInventarioPorSerial = await Inventario.findOne({serial: req.body.serial, _id: {$ne:inventario._id}}); 
-        if (existeInventarioPorSerial){
+        const existeInventarioPorSerial = await Inventario.findOne({ serial: req.body.serial, _id: { $ne: inventario._id } });
+        if (existeInventarioPorSerial) {
             return res.send('Ya existe el serial para otro equipo');
         }
 
@@ -93,17 +93,30 @@ router.put('/:inventarioId', async function(req, res){
         inventario.tipoEquipo = req.body.tipoEquipo._id;
         inventario.estadoEquipo = req.body.estadoEquipo._id;
         inventario.fechaCreacion = new Date();
-        inventario.fechaActualizacion = new Date ();
-    
+        inventario.fechaActualizacion = new Date();
+
         inventario = await inventario.save();
-    
+
         res.send(inventario);
-        
-    } catch(error){
+
+    } catch (error) {
         console.log(error);
-        res.send('Ocurrió un error');
+        res.status(500).send('Ocurrió un error');
     }
 
+});
+
+router.get('/:inventarioId', async function (req, res) {
+    try {
+        const inventario = await Inventario.findById(req.params.inventarioId);
+        if(!inventario) {
+            return res.status(404).send('No hay un inventario definido');
+        }
+        res.send(inventario);
+    }catch(error) {
+        console.log(error);
+        res.status(500).send('Ocurrió un error al consultar inventario');
+    }
 });
 
 module.exports = router; 
